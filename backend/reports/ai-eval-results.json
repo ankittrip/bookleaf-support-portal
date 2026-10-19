@@ -1,0 +1,330 @@
+{
+  "createdAt": "2026-10-19T22:50:10.118Z",
+  "model": "openai/gpt-oss-20b",
+  "aiAvailable": true,
+  "classification": null,
+  "ruleFallback": {
+    "total": 8,
+    "passed": 8,
+    "accuracy": "100.0%",
+    "priorityMinimumPassRate": "100.0%",
+    "cases": [
+      {
+        "id": "RULE-ISBN-HIGH",
+        "text": "My book has a different ISBN on Amazon than the printed copy.",
+        "expectedCategory": "ISBN & Metadata Issues",
+        "minPriority": "High",
+        "actualCategory": "ISBN & Metadata Issues",
+        "actualPriority": "High",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-ROYALTY-HIGH",
+        "text": "I haven't received any royalty for 4 months.",
+        "expectedCategory": "Royalty & Payments",
+        "minPriority": "High",
+        "actualCategory": "Royalty & Payments",
+        "actualPriority": "High",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-GENERAL-LOW",
+        "text": "Can I update my author bio?",
+        "expectedCategory": "General Inquiry",
+        "minPriority": "Low",
+        "actualCategory": "General Inquiry",
+        "actualPriority": "Low",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-METADATA-EDIT-GENERAL",
+        "text": "Can I update the description of my book on Amazon after it is live?",
+        "expectedCategory": "General Inquiry",
+        "minPriority": "Low",
+        "actualCategory": "General Inquiry",
+        "actualPriority": "Low",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-LEGAL-CRITICAL",
+        "text": "I am reporting fraud and will contact a lawyer.",
+        "expectedCategory": "General Inquiry",
+        "minPriority": "Critical",
+        "actualCategory": "General Inquiry",
+        "actualPriority": "Critical",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-PRINT-MEDIUM",
+        "text": "My author copies have blurry pages.",
+        "expectedCategory": "Printing & Quality",
+        "minPriority": "Medium",
+        "actualCategory": "Printing & Quality",
+        "actualPriority": "Medium",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-DIST-MEDIUM",
+        "text": "My published book is unavailable on Amazon.",
+        "expectedCategory": "Distribution & Availability",
+        "minPriority": "Medium",
+        "actualCategory": "Distribution & Availability",
+        "actualPriority": "Medium",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-PROD-MEDIUM",
+        "text": "Please share my book production status.",
+        "expectedCategory": "Book Status & Production Updates",
+        "minPriority": "Medium",
+        "actualCategory": "Book Status & Production Updates",
+        "actualPriority": "Medium",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      }
+    ]
+  },
+  "draftEvaluation": {
+    "total": 4,
+    "passed": 4,
+    "passRate": "100.0%",
+    "aiDraftCount": 3,
+    "templateDraftCount": 1,
+    "aiDraftRate": "75.0%",
+    "note": "Policy-signal smoke checks, not an exact or semantic comparison against reference answers. Verified supplied book facts are required. Policy-reference dates are optional; if included, they must appear only in one sentence beginning As a general policy reference.",
+    "cases": [
+      {
+        "id": "DRAFT-ROYALTY-TURBAN-TALES",
+        "source": "template",
+        "warning": "The AI draft failed accuracy checks. A template was loaded instead; review and edit it before sending.",
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": true
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "quarterly royalty policy",
+            "passed": true
+          },
+          {
+            "label": "45-day payment window",
+            "passed": true
+          }
+        ],
+        "factSignals": [
+          {
+            "label": "correct book title",
+            "passed": true
+          },
+          {
+            "label": "INR 2,464 amount",
+            "passed": true
+          },
+          {
+            "label": "amount described as pending",
+            "passed": true
+          },
+          {
+            "label": "pending balance compared against payout threshold",
+            "passed": true
+          }
+        ],
+        "forbiddenSignals": [
+          {
+            "label": "no unsupported meets-requirement phrasing",
+            "passed": true
+          },
+          {
+            "label": "no instruction to check the statement",
+            "passed": true
+          },
+          {
+            "label": "no unsupported payout eligibility or due-date claim",
+            "passed": true
+          }
+        ],
+        "optionalPolicyDateChecks": [
+          {
+            "label": "policy dates omitted or safely framed as a general policy reference",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "text": "Dear Arjun,\n\nI understand your concern regarding the status of royalties for \"Turban Tales\". As a general policy reference, BookLeaf's royalty cycle is quarterly, with a payment window of 45 days after the close of the relevant quarter, subject to applicable minimum payout requirements.\n\nThe amount for \"Turban Tales\" currently reported as pending is INR 2,464. The pending balance of INR 2,464 is above the INR 1,000 minimum payout threshold. A pending amount alone does not confirm payout eligibility or establish that payment has been scheduled. A specific payment date cannot be confirmed from the information currently available."
+      },
+      {
+        "id": "DRAFT-ISBN-MISMATCH",
+        "source": "ai",
+        "warning": null,
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": true
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "mentions ISBN",
+            "passed": true
+          },
+          {
+            "label": "high priority or production team",
+            "passed": true
+          }
+        ],
+        "factSignals": [],
+        "forbiddenSignals": [],
+        "optionalPolicyDateChecks": [],
+        "passed": true,
+        "text": "Dear Rohan,\n\nI’m sorry to hear that the ISBN listed for your book on Amazon differs from the one printed on the physical copy. ISBN mismatches are treated as high‑priority data issues, and I understand how important it is for the details to be accurate.\n\nThis matter needs to be referred to our production team for verification. Our team will verify the ISBN details and get back to you within 48 hours. In the meantime, could you please provide the ISBN printed on your copy and the ISBN shown on the Amazon listing (or a screenshot of the listing) so we can check the correct record?"
+      },
+      {
+        "id": "DRAFT-PRINTING-QUALITY",
+        "source": "ai",
+        "warning": null,
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": true
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "requests photos",
+            "passed": true
+          },
+          {
+            "label": "mentions reprint",
+            "passed": true
+          },
+          {
+            "label": "5–7 business day turnaround",
+            "passed": true
+          }
+        ],
+        "factSignals": [],
+        "forbiddenSignals": [],
+        "optionalPolicyDateChecks": [],
+        "passed": true,
+        "text": "Dear Ritika,\n\nI’m sorry to hear that your author copies have blurry images and misaligned pages – that’s not the quality standard we aim to deliver.\n\nPlease send us clear photographs of the affected pages so we can verify the defect. Once verified, BookLeaf will arrange a free reprint, with a standard turnaround of 5–7 business days from order confirmation."
+      },
+      {
+        "id": "DRAFT-DISTRIBUTION-UNAVAILABLE",
+        "source": "ai",
+        "warning": null,
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": true
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "explains stock synchronization",
+            "passed": true
+          },
+          {
+            "label": "24–48-hour typical timeframe",
+            "passed": true
+          }
+        ],
+        "factSignals": [],
+        "forbiddenSignals": [
+          {
+            "label": "no unsupported promise to contact Amazon",
+            "passed": true
+          },
+          {
+            "label": "does not tell authors to initiate re-sync",
+            "passed": true
+          }
+        ],
+        "optionalPolicyDateChecks": [],
+        "passed": true,
+        "text": "Dear Neha,\n\nI understand how concerning it can be to see your published book marked as “Currently Unavailable” on Amazon. This usually points to a stock synchronisation issue between our distribution system and the retailer’s catalogue.\n\nOur distribution team can assess whether a re‑sync is required, and a re‑sync typically takes 24‑48 hours to take effect. Please share the listing URL or a screenshot so the team can check the exact page."
+      }
+    ]
+  },
+  "classificationDataset": "main"
+}
