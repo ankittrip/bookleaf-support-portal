@@ -22,6 +22,17 @@ An AI-assisted support workspace for BookLeaf Publishing. Authors can access the
 - **API documentation:** Swagger UI is available at `http://localhost:3000/docs` when the backend is running locally.
 
 ---
+## Live Demo
+
+| Component | URL |
+|-----------|-----|
+| Frontend (Vercel) | https://frontend-amber-eta-zc5pkg9crv.vercel.app/ |
+| Backend API (Render) | https://bookleaf-support-portal-kexq.onrender.com/api |
+| Swagger UI | https://bookleaf-support-portal-kexq.onrender.com/docs |
+| Source code | https://github.com/ankittrip/bookleaf-support-portal |
+
+> **Note:** The backend runs on Render's free tier and spins down after inactivity. The first request after a idle period can take 50 seconds or more, so please allow the initial login or page load to complete.
+
 
 ## Demo Accounts
 
