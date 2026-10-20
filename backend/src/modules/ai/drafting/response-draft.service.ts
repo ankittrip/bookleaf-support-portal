@@ -62,8 +62,8 @@ const knowledge = getKnowledgeBaseForCategory(category);
 
 const playbook = getPlaybookForTicket(
   category,
-  subject,
-  description,
+  ticket.subject,
+  ticket.description,
 );
 
 const examples = getExamplesForTicket(
@@ -105,17 +105,37 @@ const instructions = this.promptBuilder.build(
         const maxOutputTokens = DRAFT_MAX_OUTPUT_TOKENS[attempt]!;
 
         const retryInstructions =
-          attempt === 0
-            ? ''
-            : `
+  attempt === 0
+    ? ''
+    : `
 The previous draft failed validation for these reasons:
 - ${lastIssues.join('\n- ')}
 
-Rewrite the entire email and correct each issue.
-Do not mention these validation instructions to the author.
-Do not introduce new facts or promises.
-Keep the greeting and exactly two body paragraphs.
-Finish the final sentence.
+Rewrite the entire email and correct every listed issue.
+
+ROYALTY ACCURACY:
+- Never claim that a pending amount guarantees payout eligibility.
+- Explicitly compare the pending balance with the INR 1,000
+  minimum payout threshold when verified facts provide the amount.
+- Explain that exceeding the threshold alone does not confirm
+  payout eligibility or scheduled payment.
+- Never invent a payment date or deadline.
+- Only use a date from derivedFacts.policyReference in a sentence
+  beginning exactly with "As a general policy reference,".
+- Do not present a general policy date as the author's confirmed
+  payment date.
+- Every general royalty-timing sentence must begin with
+  "As a general policy reference,".
+
+Preserve all original category-playbook instructions.
+Do not invent facts, investigation results, or commitments.
+Do not mention internal validation instructions to the author.
+
+Return only the complete email body:
+- A greeting using the author's actual first name.
+- Exactly two concise body paragraphs.
+- No Markdown headings or bullet points.
+- A complete final sentence.
 `;
 
         const startedAt = Date.now();
@@ -137,6 +157,11 @@ Finish the final sentence.
         );
 
         const draft = this.cleanDraft(response.output_text ?? '');
+        if (process.env.NODE_ENV !== 'production') {
+  this.logger.debug(
+    `Draft attempt ${attemptNumber} output:\n${draft}`,
+  );
+}
 
         const validationIssues = this.validator.validate(
           ticket,

@@ -1,3 +1,4 @@
+
 import type { BookLeafTicketCategory } from '../prompts/bookleaf-knowledge-base.js';
 
 export type Priority = 'Critical' | 'High' | 'Medium' | 'Low';
@@ -23,7 +24,7 @@ export function applyPriorityFloor(
   let floor: Priority =
     category === 'General Inquiry' ? 'Low' : 'Medium';
 
-  // Incorrect, discrepant, or mismatched ISBN information requires High priority.
+  // Incorrect, discrepant, or mismatched ISBN information requires High.
   if (
     category === 'ISBN & Metadata Issues' &&
     /\b(?:duplicate|wrong|different|mismatch|incorrect|discrepanc(?:y|ies)|error)\b/i.test(t)
@@ -33,7 +34,6 @@ export function applyPriorityFloor(
 
   // Delayed or unreceived royalties require High priority.
   if (category === 'Royalty & Payments') {
-    // Matches examples such as "3 months", "3+ months", and "6 month".
     const months = /\b(\d+)\s*\+?\s*months?\b/i.exec(t);
     const longWait = months !== null && Number(months[1]) >= 3;
 
@@ -45,14 +45,23 @@ export function applyPriorityFloor(
     }
   }
 
-  // Serious legal, fraud, or consumer-escalation language requires Critical priority.
+  // High-impact printing defects require High priority.
+  if (
+    category === 'Printing & Quality' &&
+    /\b(?:upside[- ]down|misprinted|wrong cover|incorrectly printed)\b/i.test(t) &&
+    /\b(?:event|launch|deadline|ordered\s+\d+|bulk)\b/i.test(t)
+  ) {
+    floor = maxPriority(floor, 'High');
+  }
+
+  // Serious legal, fraud, or consumer-escalation language requires Critical.
   if (
     /\b(?:legal|lawyer|court|fraud|scam|consumer forum)\b|\brefund all\b/i.test(t)
   ) {
     floor = 'Critical';
   }
 
-  // Never let the AI's priority fall below the rule-based priority floor.
+  // Never let AI priority fall below the deterministic priority floor.
   return maxPriority(aiPriority, floor);
 }
 
@@ -63,7 +72,12 @@ export function keywordClassify(text: string): {
   const t = text.toLowerCase();
   let category: BookLeafTicketCategory = 'General Inquiry';
 
-  if (/(royalt|payout|payment|bank|threshold)/i.test(t)) {
+  // Explicitly include royalty net-profit breakdown questions.
+  if (
+    /\b(?:royalt\w*|payout|payment|bank|threshold|80\s*%\s*(?:of\s+)?net\s+profit|net\s+profit\s+breakdown)\b/i.test(t) ||
+    /\b(?:royalt\w*|net\s+profit)\b.{0,50}\bbreakdown\b/i.test(t) ||
+    /\bbreakdown\b.{0,50}\b(?:royalt\w*|net\s+profit)\b/i.test(t)
+  ) {
     category = 'Royalty & Payments';
   } else if (/\bisbn\b|metadata/i.test(t)) {
     category = 'ISBN & Metadata Issues';

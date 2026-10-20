@@ -1,11 +1,11 @@
 {
-  "createdAt": "2026-10-19T22:50:10.118Z",
+  "createdAt": "2026-10-20T12:32:44.510Z",
   "model": "openai/gpt-oss-20b",
   "aiAvailable": true,
   "classification": null,
   "ruleFallback": {
-    "total": 8,
-    "passed": 8,
+    "total": 9,
+    "passed": 9,
     "accuracy": "100.0%",
     "priorityMinimumPassRate": "100.0%",
     "cases": [
@@ -27,6 +27,17 @@
         "minPriority": "High",
         "actualCategory": "Royalty & Payments",
         "actualPriority": "High",
+        "categoryCorrect": true,
+        "priorityMeetsMinimum": true,
+        "passed": true
+      },
+      {
+        "id": "RULE-ROYALTY-BREAKDOWN",
+        "text": "Can I get a breakdown of my 80% net profit?",
+        "expectedCategory": "Royalty & Payments",
+        "minPriority": "Medium",
+        "actualCategory": "Royalty & Payments",
+        "actualPriority": "Medium",
         "categoryCorrect": true,
         "priorityMeetsMinimum": true,
         "passed": true
@@ -100,18 +111,18 @@
     ]
   },
   "draftEvaluation": {
-    "total": 4,
-    "passed": 4,
-    "passRate": "100.0%",
-    "aiDraftCount": 3,
-    "templateDraftCount": 1,
-    "aiDraftRate": "75.0%",
+    "total": 6,
+    "passed": 0,
+    "passRate": "0.0%",
+    "aiDraftCount": 6,
+    "templateDraftCount": 0,
+    "aiDraftRate": "100.0%",
     "note": "Policy-signal smoke checks, not an exact or semantic comparison against reference answers. Verified supplied book facts are required. Policy-reference dates are optional; if included, they must appear only in one sentence beginning As a general policy reference.",
     "cases": [
       {
         "id": "DRAFT-ROYALTY-TURBAN-TALES",
-        "source": "template",
-        "warning": "The AI draft failed accuracy checks. A template was loaded instead; review and edit it before sending.",
+        "source": "ai",
+        "warning": null,
         "commonChecks": [
           {
             "label": "expected author greeting",
@@ -131,7 +142,7 @@
           },
           {
             "label": "complete final sentence",
-            "passed": true
+            "passed": false
           }
         ],
         "policySignals": [
@@ -182,8 +193,64 @@
             "passed": true
           }
         ],
-        "passed": true,
-        "text": "Dear Arjun,\n\nI understand your concern regarding the status of royalties for \"Turban Tales\". As a general policy reference, BookLeaf's royalty cycle is quarterly, with a payment window of 45 days after the close of the relevant quarter, subject to applicable minimum payout requirements.\n\nThe amount for \"Turban Tales\" currently reported as pending is INR 2,464. The pending balance of INR 2,464 is above the INR 1,000 minimum payout threshold. A pending amount alone does not confirm payout eligibility or establish that payment has been scheduled. A specific payment date cannot be confirmed from the information currently available."
+        "passed": false,
+        "text": "Dear Arjun,\n\nI understand your concern about not having received a royalty payment yet. For Turban Tales, your dashboard shows a pending balance of INR 2,464. As a general policy reference, royalties are calculated quarterly and payments are made within 45 days after each quarter ends, with a minimum payout threshold of INR 1,000. Your pending balance of INR 2,464 is above the minimum payout threshold of INR 1,000, but exceeding the minimum payout threshold alone does not confirm payout eligibility or establish that payment has been scheduled.\n\nOur team will verify your royalty statement and payment status and get back to you within 48 hours."
+      },
+      {
+        "id": "DRAFT-ROYALTY-BELOW-THRESHOLD",
+        "source": "ai",
+        "warning": null,
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": false
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "minimum payout threshold policy",
+            "passed": true
+          },
+          {
+            "label": "mentions rollover to next quarter",
+            "passed": true
+          }
+        ],
+        "factSignals": [
+          {
+            "label": "correct book title",
+            "passed": true
+          },
+          {
+            "label": "INR 850 amount",
+            "passed": true
+          }
+        ],
+        "forbiddenSignals": [
+          {
+            "label": "must not promise immediate payment",
+            "passed": true
+          }
+        ],
+        "optionalPolicyDateChecks": [],
+        "passed": false,
+        "text": "Dear Kavita,\n\nI understand your concern about the pending ₹850 royalty for *The Nagpur Notebooks*. For this title, the dashboard shows ₹850 earned, ₹0 paid, and ₹850 pending. As a general policy reference, BookLeaf calculates royalties quarterly and pays within 45 days after the quarter ends, with a minimum payout threshold of INR 1,000. Your pending balance of ₹850 is below this threshold, so it will roll over to the next payout cycle; exceeding the minimum payout threshold alone does not confirm payout eligibility or that a payment has been scheduled.\n\nOur team will verify your royalty statement and payment status and get back to you within 48 hours."
       },
       {
         "id": "DRAFT-ISBN-MISMATCH",
@@ -208,7 +275,7 @@
           },
           {
             "label": "complete final sentence",
-            "passed": true
+            "passed": false
           }
         ],
         "policySignals": [
@@ -219,13 +286,17 @@
           {
             "label": "high priority or production team",
             "passed": true
+          },
+          {
+            "label": "48 hour resolution timeline",
+            "passed": true
           }
         ],
         "factSignals": [],
         "forbiddenSignals": [],
         "optionalPolicyDateChecks": [],
-        "passed": true,
-        "text": "Dear Rohan,\n\nI’m sorry to hear that the ISBN listed for your book on Amazon differs from the one printed on the physical copy. ISBN mismatches are treated as high‑priority data issues, and I understand how important it is for the details to be accurate.\n\nThis matter needs to be referred to our production team for verification. Our team will verify the ISBN details and get back to you within 48 hours. In the meantime, could you please provide the ISBN printed on your copy and the ISBN shown on the Amazon listing (or a screenshot of the listing) so we can check the correct record?"
+        "passed": false,
+        "text": "Dear Rohan,\n\nI’m sorry to hear that the ISBN on your Amazon listing does not match the one on the printed copy. This is a serious data issue and we treat it as high priority.\n\nOur production team needs to verify the correct ISBN for your book. Please reply with the ISBN printed on the physical copy and the ISBN currently displayed on Amazon (or a URL or screenshot of the listing) so they can resolve the discrepancy. Our team will verify the ISBN details with the production team and get back to you within 48 hours."
       },
       {
         "id": "DRAFT-PRINTING-QUALITY",
@@ -250,7 +321,7 @@
           },
           {
             "label": "complete final sentence",
-            "passed": true
+            "passed": false
           }
         ],
         "policySignals": [
@@ -270,8 +341,8 @@
         "factSignals": [],
         "forbiddenSignals": [],
         "optionalPolicyDateChecks": [],
-        "passed": true,
-        "text": "Dear Ritika,\n\nI’m sorry to hear that your author copies have blurry images and misaligned pages – that’s not the quality standard we aim to deliver.\n\nPlease send us clear photographs of the affected pages so we can verify the defect. Once verified, BookLeaf will arrange a free reprint, with a standard turnaround of 5–7 business days from order confirmation."
+        "passed": false,
+        "text": "Dear Ritika,\n\nI’m sorry to hear that your author copies arrived with blurry images and misaligned pages. This is not the quality we aim to deliver, and I understand how frustrating it must be.\n\nPlease send clear photographs of the affected pages. Once we verify the defect, BookLeaf will arrange a free reprint, with a standard turnaround of 5–7 business days from order confirmation."
       },
       {
         "id": "DRAFT-DISTRIBUTION-UNAVAILABLE",
@@ -296,7 +367,7 @@
           },
           {
             "label": "complete final sentence",
-            "passed": true
+            "passed": false
           }
         ],
         "policySignals": [
@@ -321,8 +392,46 @@
           }
         ],
         "optionalPolicyDateChecks": [],
-        "passed": true,
-        "text": "Dear Neha,\n\nI understand how concerning it can be to see your published book marked as “Currently Unavailable” on Amazon. This usually points to a stock synchronisation issue between our distribution system and the retailer’s catalogue.\n\nOur distribution team can assess whether a re‑sync is required, and a re‑sync typically takes 24‑48 hours to take effect. Please share the listing URL or a screenshot so the team can check the exact page."
+        "passed": false,
+        "text": "Dear Neha,\n\nI understand how concerning it is to see your published book marked as Currently Unavailable on Amazon. This usually indicates a stock synchronization issue between our distribution system and the retailer’s platform.\n\nOur distribution team can assess whether a re‑sync is needed, and a re‑sync typically takes 24–48 hours to take effect. Please provide the listing URL or a screenshot of the page so the team can investigate the issue directly."
+      },
+      {
+        "id": "DRAFT-DISTRIBUTION-NEW-LISTING",
+        "source": "ai",
+        "warning": null,
+        "commonChecks": [
+          {
+            "label": "expected author greeting",
+            "passed": true
+          },
+          {
+            "label": "no placeholders",
+            "passed": true
+          },
+          {
+            "label": "no admin-facing text",
+            "passed": true
+          },
+          {
+            "label": "no first-person follow-up promise",
+            "passed": true
+          },
+          {
+            "label": "complete final sentence",
+            "passed": false
+          }
+        ],
+        "policySignals": [
+          {
+            "label": "7-10 business day timeline",
+            "passed": false
+          }
+        ],
+        "factSignals": [],
+        "forbiddenSignals": [],
+        "optionalPolicyDateChecks": [],
+        "passed": false,
+        "text": "Dear Vikram,\n\nI understand how concerning it can be that your book is not yet visible on Flipkart, especially after completion yesterday. An unavailable listing often points to a stock synchronisation issue, which is usually resolved once the distribution team re‑syncs the catalogue.\n\nOur distribution team can assess whether a re‑sync is required, and a re‑sync typically takes 24–48 hours to take effect. Please share the Flipkart listing URL or a screenshot so the team can verify the status and take the necessary action."
       }
     ]
   },

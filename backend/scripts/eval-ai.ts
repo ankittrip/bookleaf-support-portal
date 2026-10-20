@@ -32,138 +32,39 @@ interface ClassificationCase {
 }
 
 const CASES: ClassificationCase[] = [
-  {
-    id: 'ROYALTY-01',
-    subject: 'Royalty not received',
-    description: "I published 4 months ago and still haven't received any royalty.",
-    expectedCategory: 'Royalty & Payments',
-    minPriority: 'High',
-    bookTitle: 'Moonlit Paths',
-  },
-  {
-    id: 'ROYALTY-02',
-    subject: 'Royalty amount seems low',
-    description: 'I sold 200 copies but only received INR 3,000. Can I get a line-by-line breakdown?',
-    expectedCategory: 'Royalty & Payments',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'ISBN-01',
-    subject: 'ISBN mismatch',
-    description: 'My book shows a different ISBN on Amazon than on the physical copy.',
-    expectedCategory: 'ISBN & Metadata Issues',
-    minPriority: 'High',
-  },
-  {
-    id: 'ISBN-02',
-    subject: 'Incorrect ISBN metadata',
-    description: 'The ISBN in my book metadata is incorrect and appears duplicated on the online listing.',
-    expectedCategory: 'ISBN & Metadata Issues',
-    minPriority: 'High',
-  },
-  {
-    id: 'PRINT-01',
-    subject: 'Blurry pages and misaligned printing',
-    description: 'My author copies have blurry images and several pages are misaligned.',
-    expectedCategory: 'Printing & Quality',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'PRINT-02',
-    subject: 'Damaged binding',
-    description: 'The binding is damaged and several pages are printed incorrectly. Can this be reprinted?',
-    expectedCategory: 'Printing & Quality',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'DIST-01',
-    subject: 'Amazon listing unavailable',
-    description: 'My book is published but it is showing Currently Unavailable on Amazon.',
-    expectedCategory: 'Distribution & Availability',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'DIST-02',
-    subject: 'Book listing not visible',
-    description: 'My title is missing from Flipkart and the stock availability has not updated.',
-    expectedCategory: 'Distribution & Availability',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'PROD-01',
-    subject: 'Book still in typesetting',
-    description: "It's been 3 weeks and my book is still in typesetting. When will it be done?",
-    expectedCategory: 'Book Status & Production Updates',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'PROD-02',
-    subject: 'Production status update',
-    description: 'Can you share the current production status? I am waiting for proofreading and cover approval.',
-    expectedCategory: 'Book Status & Production Updates',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'GENERAL-01',
-    subject: 'Update author bio',
-    description: 'Can I update my author bio?',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Low',
-  },
-  {
-    id: 'GENERAL-02',
-    subject: 'Change book description',
-    description: 'Can I update the description of my book on Amazon after it is already live?',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Low',
-  },
+  { id: 'ROYALTY-01', subject: 'Royalty not received', description: "I published 4 months ago and still haven't received any royalty.", expectedCategory: 'Royalty & Payments', minPriority: 'High', bookTitle: 'Moonlit Paths' },
+  { id: 'ROYALTY-02', subject: 'Royalty amount seems low', description: 'I sold 200 copies but only received INR 3,000. Can I get a line-by-line breakdown?', expectedCategory: 'Royalty & Payments', minPriority: 'Medium' },
+  { id: 'ROYALTY-03', subject: 'Below threshold payout', description: 'My dashboard shows ₹850 earned. Will this be deposited to my bank this quarter?', expectedCategory: 'Royalty & Payments', minPriority: 'Medium' },
+  { id: 'ROYALTY-04', subject: 'Bank account update for payouts', description: 'I need to change the bank account where my quarterly royalties are sent.', expectedCategory: 'Royalty & Payments', minPriority: 'Medium' },
+
+  { id: 'ISBN-01', subject: 'ISBN mismatch', description: 'My book shows a different ISBN on Amazon than on the physical copy.', expectedCategory: 'ISBN & Metadata Issues', minPriority: 'High' },
+  { id: 'ISBN-02', subject: 'Incorrect ISBN metadata', description: 'The ISBN in my book metadata is incorrect and appears duplicated on the online listing.', expectedCategory: 'ISBN & Metadata Issues', minPriority: 'High' },
+  { id: 'ISBN-03', subject: 'Own Imprint ISBN', description: 'I want to use my own ISBN under my publishing imprint instead of the BookLeaf assigned one.', expectedCategory: 'ISBN & Metadata Issues', minPriority: 'Medium' },
+
+  { id: 'PRINT-01', subject: 'Blurry pages and misaligned printing', description: 'My author copies have blurry images and several pages are misaligned.', expectedCategory: 'Printing & Quality', minPriority: 'Medium' },
+  { id: 'PRINT-02', subject: 'Damaged binding', description: 'The binding is damaged and several pages are printed incorrectly. Can this be reprinted?', expectedCategory: 'Printing & Quality', minPriority: 'Medium' },
+  { id: 'PRINT-03', subject: 'Upside down cover', description: 'I ordered 10 copies for an event and the covers are printed upside down!', expectedCategory: 'Printing & Quality', minPriority: 'High' },
+
+  { id: 'DIST-01', subject: 'Amazon listing unavailable', description: 'My book is published but it is showing Currently Unavailable on Amazon.', expectedCategory: 'Distribution & Availability', minPriority: 'Medium' },
+  { id: 'DIST-02', subject: 'Book listing not visible', description: 'My title is missing from Flipkart and the stock availability has not updated.', expectedCategory: 'Distribution & Availability', minPriority: 'Medium' },
+  { id: 'DIST-03', subject: 'New listing not live yet', description: 'My book finished production 2 days ago but I cannot find it on the BookLeaf Store or Amazon.', expectedCategory: 'Distribution & Availability', minPriority: 'Low' },
+
+  { id: 'PROD-01', subject: 'Book still in typesetting', description: "It's been 3 weeks and my book is still in typesetting. When will it be done?", expectedCategory: 'Book Status & Production Updates', minPriority: 'Medium' },
+  { id: 'PROD-02', subject: 'Production status update', description: 'Can you share the current production status? I am waiting for proofreading and cover approval.', expectedCategory: 'Book Status & Production Updates', minPriority: 'Medium' },
+  { id: 'PROD-03', subject: 'Cover design delay', description: 'I submitted my manuscript a month ago. How long until I see the first cover design concepts?', expectedCategory: 'Book Status & Production Updates', minPriority: 'Low' },
+
+  { id: 'GENERAL-01', subject: 'Update author bio', description: 'Can I update my author bio?', expectedCategory: 'General Inquiry', minPriority: 'Low' },
+  { id: 'GENERAL-02', subject: 'Change book description', description: 'Can I update the description of my book on Amazon after it is already live?', expectedCategory: 'General Inquiry', minPriority: 'Low' },
+  { id: 'GENERAL-03', subject: 'Marketing packages', description: 'How do I upgrade from the Standard Free package to the Bestseller Breakthrough package?', expectedCategory: 'General Inquiry', minPriority: 'Low' },
 ];
 
-// Separate generalization set: intentionally different wording from CASES.
-// Run with --heldout to score these cases without conflating them with the main set.
 const HELD_OUT: ClassificationCase[] = [
-  {
-    id: 'HELDOUT-ROYALTY-QUARTERLY',
-    subject: 'Previous quarter payment missing',
-    description: 'The last quarterly royalty payout never arrived, and I need the payment status checked.',
-    expectedCategory: 'Royalty & Payments',
-    minPriority: 'High',
-  },
-  {
-    id: 'HELDOUT-ISBN-ONLINE-PRINT',
-    subject: 'Bookstore identifier mismatch',
-    description: 'The ISBN shown on the retailer page does not match the identifier printed inside my book.',
-    expectedCategory: 'ISBN & Metadata Issues',
-    minPriority: 'High',
-  },
-  {
-    id: 'HELDOUT-PRINT-COVER',
-    subject: 'Cover is peeling on author copies',
-    description: 'Several copies arrived with peeling cover lamination and damaged binding.',
-    expectedCategory: 'Printing & Quality',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'HELDOUT-DIST-RETAILER',
-    subject: 'Retailer cannot order my title',
-    description: 'My book page is visible, but the retailer says the title is unavailable to order.',
-    expectedCategory: 'Distribution & Availability',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'HELDOUT-PROD-PROOFREADING',
-    subject: 'Proofreading stage update',
-    description: 'The dashboard still says proofreading and I am waiting to know the current production stage.',
-    expectedCategory: 'Book Status & Production Updates',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'HELDOUT-GENERAL-BIO',
-    subject: 'Update my author profile',
-    description: 'I want to change the short biography displayed on my author profile.',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Low',
-  },
+  { id: 'HELDOUT-ROYALTY-QUARTERLY', subject: 'Previous quarter payment missing', description: 'The last quarterly royalty payout never arrived, and I need the payment status checked.', expectedCategory: 'Royalty & Payments', minPriority: 'High' },
+  { id: 'HELDOUT-ISBN-ONLINE-PRINT', subject: 'Bookstore identifier mismatch', description: 'The ISBN shown on the retailer page does not match the identifier printed inside my book.', expectedCategory: 'ISBN & Metadata Issues', minPriority: 'High' },
+  { id: 'HELDOUT-PRINT-COVER', subject: 'Cover is peeling on author copies', description: 'Several copies arrived with peeling cover lamination and damaged binding.', expectedCategory: 'Printing & Quality', minPriority: 'Medium' },
+  { id: 'HELDOUT-DIST-RETAILER', subject: 'Retailer cannot order my title', description: 'My book page is visible, but the retailer says the title is unavailable to order.', expectedCategory: 'Distribution & Availability', minPriority: 'Medium' },
+  { id: 'HELDOUT-PROD-PROOFREADING', subject: 'Proofreading stage update', description: 'The dashboard still says proofreading and I am waiting to know the current production stage.', expectedCategory: 'Book Status & Production Updates', minPriority: 'Medium' },
+  { id: 'HELDOUT-GENERAL-BIO', subject: 'Update my author profile', description: 'I want to change the short biography displayed on my author profile.', expectedCategory: 'General Inquiry', minPriority: 'Low' },
 ];
 
 const PRIORITY_RANK: Record<TicketPriority, number> = {
@@ -181,54 +82,15 @@ interface RuleTest {
 }
 
 const RULE_TESTS: RuleTest[] = [
-  {
-    id: 'RULE-ISBN-HIGH',
-    text: 'My book has a different ISBN on Amazon than the printed copy.',
-    expectedCategory: 'ISBN & Metadata Issues',
-    minPriority: 'High',
-  },
-  {
-    id: 'RULE-ROYALTY-HIGH',
-    text: "I haven't received any royalty for 4 months.",
-    expectedCategory: 'Royalty & Payments',
-    minPriority: 'High',
-  },
-  {
-    id: 'RULE-GENERAL-LOW',
-    text: 'Can I update my author bio?',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Low',
-  },
-  {
-    id: 'RULE-METADATA-EDIT-GENERAL',
-    text: 'Can I update the description of my book on Amazon after it is live?',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Low',
-  },
-  {
-    id: 'RULE-LEGAL-CRITICAL',
-    text: 'I am reporting fraud and will contact a lawyer.',
-    expectedCategory: 'General Inquiry',
-    minPriority: 'Critical',
-  },
-  {
-    id: 'RULE-PRINT-MEDIUM',
-    text: 'My author copies have blurry pages.',
-    expectedCategory: 'Printing & Quality',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'RULE-DIST-MEDIUM',
-    text: 'My published book is unavailable on Amazon.',
-    expectedCategory: 'Distribution & Availability',
-    minPriority: 'Medium',
-  },
-  {
-    id: 'RULE-PROD-MEDIUM',
-    text: 'Please share my book production status.',
-    expectedCategory: 'Book Status & Production Updates',
-    minPriority: 'Medium',
-  },
+  { id: 'RULE-ISBN-HIGH', text: 'My book has a different ISBN on Amazon than the printed copy.', expectedCategory: 'ISBN & Metadata Issues', minPriority: 'High' },
+  { id: 'RULE-ROYALTY-HIGH', text: "I haven't received any royalty for 4 months.", expectedCategory: 'Royalty & Payments', minPriority: 'High' },
+  { id: 'RULE-ROYALTY-BREAKDOWN', text: 'Can I get a breakdown of my 80% net profit?', expectedCategory: 'Royalty & Payments', minPriority: 'Medium' },
+  { id: 'RULE-GENERAL-LOW', text: 'Can I update my author bio?', expectedCategory: 'General Inquiry', minPriority: 'Low' },
+  { id: 'RULE-METADATA-EDIT-GENERAL', text: 'Can I update the description of my book on Amazon after it is live?', expectedCategory: 'General Inquiry', minPriority: 'Low' },
+  { id: 'RULE-LEGAL-CRITICAL', text: 'I am reporting fraud and will contact a lawyer.', expectedCategory: 'General Inquiry', minPriority: 'Critical' },
+  { id: 'RULE-PRINT-MEDIUM', text: 'My author copies have blurry pages.', expectedCategory: 'Printing & Quality', minPriority: 'Medium' },
+  { id: 'RULE-DIST-MEDIUM', text: 'My published book is unavailable on Amazon.', expectedCategory: 'Distribution & Availability', minPriority: 'Medium' },
+  { id: 'RULE-PROD-MEDIUM', text: 'Please share my book production status.', expectedCategory: 'Book Status & Production Updates', minPriority: 'Medium' },
 ];
 
 interface DraftSignal {
@@ -252,8 +114,16 @@ const TURBAN_TALES_BOOK_CONTEXT: Record<string, unknown> = {
   royaltyPending: 2464,
 };
 
+const NAGPUR_NOTEBOOKS_CONTEXT: Record<string, unknown> = { 
+  title: 'The Nagpur Notebooks', 
+  totalCopiesSold: 34, 
+  totalRoyaltyEarned: 850, 
+  royaltyPaid: 0, 
+  royaltyPending: 850 
+};
+
 function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.replace(/[.*+?^\${}()|[\]\\]/g, '\\$&');
 }
 
 function normalizeForChecks(value: string): string {
@@ -266,6 +136,7 @@ function normalizeForChecks(value: string): string {
 }
 
 const TURBAN_TALES_DERIVED_FACTS = buildDerivedFacts(TURBAN_TALES_BOOK_CONTEXT);
+
 const DRAFT_CASES: DraftCase[] = [
   {
     id: 'DRAFT-ROYALTY-TURBAN-TALES',
@@ -289,21 +160,40 @@ const DRAFT_CASES: DraftCase[] = [
         pattern: /(?:pending|outstanding|unpaid).{0,60}(?:₹\s*|INR\s*)?2,?464|(?:₹\s*|INR\s*)?2,?464.{0,80}(?:pending|outstanding|unpaid|none has been paid|has not been paid|not yet paid)/i,
       },
       {
-  label: 'pending balance compared against payout threshold',
-  pattern:
-    /\b(?:pending|outstanding|unpaid)\b[^.!?\n]{0,120}\b(?:above|over|exceeds?|exceeding|greater than|higher than|at least|surpasses?)\b[^.!?\n]{0,80}\b(?:that\s+)?(?:minimum\s+)?(?:payout\s+)?threshold\b|\b(?:balance|amount)\b[^.!?\n]{0,100}\b(?:above|over|exceeds?|exceeding|greater than|higher than|at least|surpasses?)\b[^.!?\n]{0,80}\b(?:that\s+)?(?:minimum\s+)?(?:payout\s+)?threshold\b/i,
-},
+        label: 'pending balance compared against payout threshold',
+        pattern: /\b(?:pending|outstanding|unpaid)\b[^.!?\n]{0,120}\b(?:above|over|exceeds?|exceeding|greater than|higher than|at least|surpasses?)\b[^.!?\n]{0,80}\b(?:that\s+)?(?:minimum\s+)?(?:payout\s+)?threshold\b|\b(?:balance|amount)\b[^.!?\n]{0,100}\b(?:above|over|exceeds?|exceeding|greater than|higher than|at least|surpasses?)\b[^.!?\n]{0,80}\b(?:that\s+)?(?:minimum\s+)?(?:payout\s+)?threshold\b/i,
+      },
     ],
     forbiddenSignals: [
       { label: 'no unsupported meets-requirement phrasing', pattern: /meets (?:the )?requirement/i },
       { label: 'no instruction to check the statement', pattern: /please check (?:the )?statement/i },
-      
       {
         label: 'no unsupported payout eligibility or due-date claim',
-        pattern:
-          /\b(?:eligible\s+for\s+(?:payment|payout)|qualif(?:y|ies|ied)\s+for\s+(?:payment|a\s+payout)|payout\s+is\s+due|eligible\b[^.!?\n]{0,80}\b(?:upcoming|next)\s+(?:payout|payment)\s+cycle)\b/i,
+        pattern: /\b(?:eligible\s+for\s+(?:payment|payout)|qualif(?:y|ies|ied)\s+for\s+(?:payment|a\s+payout)|payout\s+is\s+due|eligible\b[^.!?\n]{0,80}\b(?:upcoming|next)\s+(?:payout|payment)\s+cycle)\b/i,
       },
     ],
+  },
+  {
+    id: 'DRAFT-ROYALTY-BELOW-THRESHOLD',
+    ticket: { 
+      subject: 'Royalty payout for The Nagpur Notebooks', 
+      description: "When will my ₹850 royalty be deposited?", 
+      category: 'Royalty & Payments', 
+      priority: 'Medium', 
+      authorName: 'Kavita Deshmukh', 
+      bookContext: NAGPUR_NOTEBOOKS_CONTEXT 
+    },
+    policySignals: [
+      { label: 'minimum payout threshold policy', pattern: /₹?1,?000|threshold/i },
+      { label: 'mentions rollover to next quarter', pattern: /roll\s*over|next quarter/i },
+    ],
+    requiredFactSignals: [
+      { label: 'correct book title', pattern: /The\s+Nagpur\s+Notebooks/i },
+      { label: 'INR 850 amount', pattern: /(?:₹\s*|INR\s*)?850(?:\.00)?/i },
+    ],
+    forbiddenSignals: [
+      { label: 'must not promise immediate payment', pattern: /\b(?:payout\s+is\s+due|will\s+be\s+paid\s+within)\b/i },
+    ]
   },
   {
     id: 'DRAFT-ISBN-MISMATCH',
@@ -317,6 +207,7 @@ const DRAFT_CASES: DraftCase[] = [
     policySignals: [
       { label: 'mentions ISBN', pattern: /\bISBN\b/i },
       { label: 'high priority or production team', pattern: /high priority|production team/i },
+      { label: '48 hour resolution timeline', pattern: /48\s*hours/i },
     ],
   },
   {
@@ -361,6 +252,19 @@ const DRAFT_CASES: DraftCase[] = [
       },
     ],
   },
+  {
+    id: 'DRAFT-DISTRIBUTION-NEW-LISTING',
+    ticket: { 
+      subject: 'Not visible on Flipkart yet', 
+      description: 'My publication finished yesterday but I cannot find it on Flipkart.', 
+      category: 'Distribution & Availability', 
+      priority: 'Low', 
+      authorName: 'Vikram Joshi' 
+    },
+    policySignals: [
+      { label: '7-10 business day timeline', pattern: /7\s*[-–—]\s*10\s+business days/i },
+    ],
+  }
 ];
 
 const FIRST_PERSON_PROMISE =
@@ -379,8 +283,7 @@ async function main(): Promise<void> {
   const draftsOnly = args.has('--drafts-only');
   const heldOutOnly = args.has('--heldout');
   const includeDrafts = args.has('--drafts') || draftsOnly;
-  // Avoid repeating 12 model calls when only testing draft quality. This helps
-  // stay within provider TPM limits on lower-tier API plans.
+  
   const runClassification = !draftsOnly;
   const selectedCases = heldOutOnly ? HELD_OUT : CASES;
   const configService = new ConfigService();
@@ -412,7 +315,6 @@ async function main(): Promise<void> {
   console.log(`Model: ${String(report.model)}`);
   console.log(`AI configured: ${aiAvailable ? 'yes' : 'no'}`);
 
-  // This rule-based check runs even without an API key.
   const fallbackResults = RULE_TESTS.map((test) => {
     const result = keywordClassify(test.text);
     const categoryCorrect = result.category === test.expectedCategory;
@@ -454,7 +356,6 @@ async function main(): Promise<void> {
       };
       const result = await aiService.classifyTicket(input);
       const categoryCorrect = result?.category === test.expectedCategory;
-      // classifyTicket() applies deterministic priority floors before returning.
       const priorityMeetsMinimum = result
         ? PRIORITY_RANK[result.priority] >= PRIORITY_RANK[test.minPriority]
         : false;
@@ -525,7 +426,7 @@ async function main(): Promise<void> {
   }
 
   if (includeDrafts) {
-    console.log('\nDraft quality checks (4 sample knowledge-base scenarios)');
+    console.log(`\nDraft quality checks (${DRAFT_CASES.length} sample knowledge-base scenarios)`);
     const draftResults = [];
 
     for (let draftIndex = 0; draftIndex < DRAFT_CASES.length; draftIndex += 1) {
@@ -555,7 +456,7 @@ async function main(): Promise<void> {
         },
         {
           label: 'complete final sentence',
-          passed: /[.!?]["'’”)}\]]?\s*$/.test(normalizedText),
+          passed: /[.!?]["'’”)}\]]?\s*\$/.test(normalizedText),
         },
       ];
 
@@ -563,9 +464,6 @@ async function main(): Promise<void> {
         label: signal.label,
         passed: signal.pattern.test(normalizedText),
       }));
-      // Require verified book facts. Policy-reference dates are optional:
-      // if included, they must be framed in a sentence explicitly labelled
-      // as a general policy reference, not as this author's payout date.
       const factSignals = (test.requiredFactSignals ?? []).map((signal) => ({
         label: signal.label,
         passed: signal.pattern.test(normalizedText),
@@ -602,24 +500,37 @@ async function main(): Promise<void> {
           }]
         : [];
 
-      const failed = [
-        ...commonChecks,
-        ...policySignals,
-        ...factSignals,
-        ...forbiddenSignals,
-        ...optionalPolicyDateChecks,
-      ].filter((signal) => !signal.passed);
       const policyPass = policySignals.every((signal) => signal.passed);
       const factPass = factSignals.every((signal) => signal.passed);
       const forbiddenPass = forbiddenSignals.every((signal) => signal.passed);
       const commonPass = commonChecks.every((signal) => signal.passed);
       const optionalDatePass = optionalPolicyDateChecks.every((signal) => signal.passed);
+      
       const passed = commonPass && policyPass && factPass && forbiddenPass && optionalDatePass;
 
       if (!passed) classificationHadFailures = true;
-      console.log(
-        `${passed ? 'PASS' : 'FAIL'} ${test.id}: source=${result.source}; common=${commonPass ? 'pass' : 'fail'}; policy=${policyPass ? 'pass' : 'fail'}; facts=${factSignals.length ? (factPass ? 'pass' : 'fail') : 'n/a'}; ${failed.length ? `issues: ${failed.map((x) => x.label).join(', ')}` : 'no signal issues'}`,
-      );
+      
+      console.log({
+        id: test.id,
+        source: result.source,
+        passed,
+        commonFailures: commonChecks
+          .filter((item) => !item.passed)
+          .map((item) => item.label),
+        policyFailures: policySignals
+          .filter((item) => !item.passed)
+          .map((item) => item.label),
+        factFailures: factSignals
+          .filter((item) => !item.passed)
+          .map((item) => item.label),
+        forbiddenFailures: forbiddenSignals
+          .filter((item) => !item.passed)
+          .map((item) => item.label),
+        dateFailures: optionalPolicyDateChecks
+          .filter((item) => !item.passed)
+          .map((item) => item.label),
+      });
+
       if (!passed) {
         console.error(
           `\n--- FAILED DRAFT TEXT: ${test.id} (source=${result.source}) ---\n${text}\n--- END FAILED DRAFT TEXT ---\n`,
@@ -639,7 +550,6 @@ async function main(): Promise<void> {
         text,
       });
 
-      // Space draft generation calls to reduce provider TPM bursts.
       if (aiAvailable && draftIndex < DRAFT_CASES.length - 1) {
         console.log('Waiting 60 seconds before the next draft check to reduce TPM pressure...');
         await sleep(65_000);

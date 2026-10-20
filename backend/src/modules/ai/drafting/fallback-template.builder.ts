@@ -115,6 +115,18 @@ export class FallbackTemplateBuilder {
     }
 
     if (
+  /\b(?:description|metadata|author bio|book bio)\b/i.test(ticketText)
+) {
+  return {
+    paragraphOne:
+      'Yes, you can update your book description after it has gone live on Amazon. Description and metadata changes can be submitted through your author dashboard or by emailing the BookLeaf team.',
+
+    paragraphTwo:
+      'Once submitted, changes typically reflect on platforms within 3–5 business days. To get started, submit the revised description through your author dashboard or email the updated text to BookLeaf.',
+  };
+}
+
+    if (
       category.includes('publication') ||
       category.includes('book') ||
       category.includes('author')

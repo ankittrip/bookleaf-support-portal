@@ -42,8 +42,6 @@ const RESOLUTION_PROMISE_PATTERN =
 const PAYMENT_DATE_PROMISE_PATTERN =
   /\b(?:you will receive|you should receive|payment will be credited|the amount will be credited|your payment will arrive)\b[^.!?\n]{0,100}\b(?:on|by|before|within)\s+(?:\d{1,2}[/-]\d{1,2}|tomorrow|today|the next \d+ days?)\b/i;
 
-// Flag affirmative payout claims, not careful caveats such as "the balance is
-// above the threshold, but this alone does not confirm payout eligibility".
 const ROYALTY_ELIGIBILITY_PATTERN =
   /\b(?:(?:your|the|this|that|it)\s+)?(?:pending\s+)?(?:royalty\s+)?(?:balance|amount|payment|payout)\b[^.!?\n]{0,110}\b(?:qualifies for (?:a )?(?:payout|payment)|is eligible for (?:a )?(?:payout|payment)|is payable|will be paid|has qualified for (?:a )?(?:payout|payment)|makes you eligible for (?:a )?(?:payout|payment))\b|\b(?:it|this balance|this amount|the pending balance|the pending amount)\s+(?:therefore\s+)?(?:qualifies for (?:a )?(?:payout|payment)|is eligible for (?:a )?(?:payout|payment)|is payable|will be paid)\b|\b(?:you are eligible|you qualify|you now qualify|you are entitled to)\b[^.!?\n]{0,100}\b(?:payout|payment|royalt(?:y|ies)|upcoming cycle)\b/i;
 
@@ -54,8 +52,7 @@ const PAYOUT_CAVEAT_PATTERN =
   /\b(?:does not|doesn't|do not|don't|cannot|can't|not alone|alone does not|by itself does not|does not by itself|does not necessarily)\b[^.!?\n]{0,100}\b(?:confirm|establish|prove|mean|guarantee|determine)\b[^.!?\n]{0,100}\b(?:payout eligibility|eligibility|payment date|payment is due|payment is scheduled|payout|payment|will be paid)\b|\b(?:meeting|exceeding|being above|being below)\s+(?:the )?(?:minimum )?(?:payout )?threshold\b[^.!?\n]{0,100}\bdoes not\b[^.!?\n]{0,60}\b(?:confirm|establish|guarantee)\b/i;
 
 const THRESHOLD_COMPARISON_PATTERN =
-  /\b(?:pending (?:royalty )?(?:balance|amount)|(?:royalty )?(?:balance|amount) (?:currently )?pending|pending amount)\b[^.!?\n]{0,120}\b(?:above|below|exceeds|is greater than|is less than|higher than|lower than|does not exceed|is at or below|is under|is over)\b[^.!?\n]{0,80}\b(?:minimum )?(?:payout )?threshold\b|\b(?:above|below|exceeds|is greater than|is less than|higher than|lower than|does not exceed|is at or below|is under|is over)\b[^.!?\n]{0,80}\b(?:the )?(?:minimum )?(?:payout )?threshold\b/i;
-
+  /\b(?:pending\s+(?:royalty\s+)?(?:balance|amount)|(?:royalty\s+)?(?:balance|amount)\s+(?:currently\s+)?pending)\b[^.!?\n]{0,120}\b(?:above|below|exceeds|is greater than|is less than|higher than|lower than|does not exceed|is at or below|is under|is over)\b[^.!?\n]{0,80}\b(?:(?:the|that)\s+)?(?:(?:minimum|payout)\s+){0,2}threshold\b|\b(?:above|below|exceeds|is greater than|is less than|higher than|lower than|does not exceed|is at or below|is under|is over)\b[^.!?\n]{0,80}\b(?:(?:the|that)\s+)?(?:(?:minimum|payout)\s+){0,2}threshold\b/i;
 const NO_FURTHER_INFO_PATTERN =
   /\b(?:no further (?:information|info|details) (?:is|are|will be) (?:required|needed|necessary)|no additional (?:information|details) (?:is|are|will be) (?:required|needed|necessary)|nothing else (?:is|will be) required from you|nothing further (?:is|will be) needed from you|no further action is needed from your side|no action is required from your side|you do not need to provide (?:anything|anything else|any other information|any further information|any additional information)|you need not provide anything further)\b/i;
 
@@ -65,75 +62,108 @@ const BANK_DETAILS_ASSERTION_PATTERN =
 const BANK_DETAILS_CHECK_REQUEST_PATTERN =
   /\b(?:please\s+)?(?:check|verify|confirm|make sure)\b[^.!?\n]{0,100}\bbank(?: account)?\s+(?:details|information)\b/i;
 
-// Specific calendar dates require an exact supporting source date. A general-
-// policy prefix must not make an invented calendar deadline acceptable.
 const DATE_OR_PERIOD_PATTERN = /\b(?:next quarter|upcoming cycle)\b/i;
 const POLICY_REFERENCE_PREFIX = /^\s*As a general policy reference,/i;
 
 @Injectable()
 export class DraftValidator {
   validate(
-    ticket: TicketDraftInput,
-    draft: string,
-    derivedFacts?: unknown,
-  ): string[] {
-    const issues: string[] = [];
+  ticket: TicketDraftInput,
+  draft: string,
+  derivedFacts?: unknown,
+): string[] {
+  const issues: string[] = [];
 
-    if (!draft.trim()) {
-      return ['The generated draft is empty.'];
-    }
-
-    const ticketRecord = ticket as unknown as Record<string, unknown>;
-    const category = String(ticketRecord.category ?? '').toLowerCase();
-
-    const ticketText = [
-      ticketRecord.subject,
-      ticketRecord.description,
-      ticketRecord.message,
-      ticketRecord.body,
-    ]
-      .filter((value): value is string => typeof value === 'string')
-      .join('\n');
-
-    const factsText = toText(derivedFacts);
-    const bookContextText = toText(ticketRecord.bookContext);
-    const numericSourceText = [ticketText, factsText, bookContextText]
-      .filter(Boolean)
-      .join('\n');
-    const sourceTimeText = [ticketText, bookContextText]
-      .filter(Boolean)
-      .join('\n');
-
-    const normalizedDraft = normalizeWhitespace(draft);
-
-    this.validatePlaceholders(normalizedDraft, issues);
-    this.validateInternalLanguage(normalizedDraft, issues);
-    this.validateStructure(normalizedDraft, issues);
-    this.validateUnsupportedNumbers(normalizedDraft, numericSourceText, issues);
-    this.validateRoyaltyClaims(
-      normalizedDraft,
-      ticketText,
-      numericSourceText,
-      category,
-      issues,
-    );
-    this.validateActions(
-      normalizedDraft,
-      factsText,
-      ticketText,
-      category,
-      issues,
-    );
-    this.validateMissingInformationClaims(
-      normalizedDraft,
-      ticketRecord,
-      derivedFacts,
-      issues,
-    );
-    this.validateTiming(normalizedDraft, sourceTimeText, issues);
-
-    return [...new Set(issues)];
+  if (!draft.trim()) {
+    return ['The generated draft is empty.'];
   }
+
+  const ticketRecord = ticket as unknown as Record<string, unknown>;
+  const category = String(ticketRecord.category ?? '').toLowerCase();
+
+  const ticketText = [
+    ticketRecord.subject,
+    ticketRecord.description,
+    ticketRecord.message,
+    ticketRecord.body,
+  ]
+    .filter((value): value is string => typeof value === 'string')
+    .join('\n');
+
+  const factsText = toText(derivedFacts);
+  const bookContextText = toText(ticketRecord.bookContext);
+
+  const numericSourceText = [
+    ticketText,
+    factsText,
+    bookContextText,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  // Ordinary ticket and book facts can support dates as before.
+  const sourceTimeText = [
+    ticketText,
+    bookContextText,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  // Policy-reference dates receive a separate, restricted allowance.
+  const factsRecord =
+    typeof derivedFacts === 'object' && derivedFacts !== null
+      ? (derivedFacts as Record<string, unknown>)
+      : undefined;
+
+  const policyReferenceText =
+    factsRecord?.policyReference === undefined
+      ? ''
+      : toText(factsRecord.policyReference);
+
+  const normalizedDraft = normalizeWhitespace(draft);
+
+  this.validatePlaceholders(normalizedDraft, issues);
+  this.validateInternalLanguage(normalizedDraft, issues);
+  this.validateStructure(normalizedDraft, issues);
+
+  this.validateUnsupportedNumbers(
+    normalizedDraft,
+    numericSourceText,
+    issues,
+  );
+
+  this.validateRoyaltyClaims(
+    normalizedDraft,
+    ticketText,
+    numericSourceText,
+    category,
+    issues,
+  );
+
+  this.validateActions(
+    normalizedDraft,
+    factsText,
+    ticketText,
+    category,
+    issues,
+  );
+
+  this.validateMissingInformationClaims(
+    normalizedDraft,
+    ticketRecord,
+    derivedFacts,
+    issues,
+  );
+
+  this.validateTiming(
+    normalizedDraft,
+    sourceTimeText,
+    policyReferenceText,
+    issues,
+  );
+
+  return [...new Set(issues)];
+}
 
   private validatePlaceholders(draft: string, issues: string[]): void {
     if (PLACEHOLDER_PATTERN.test(draft)) {
@@ -197,9 +227,9 @@ export class DraftValidator {
     for (const match of matches) {
       const normalized = normalizeNumberToken(match);
       const standardPolicyReference =
-        /\b(?:24\s*[-–—]\s*48\s+hours?|48\s+hours?|45\s+days?|5\s*[-–—]\s*7\s+business\s+days?|80\s*\/\s*20|1,?000)\b/i.test(
-          match,
-        );
+  /\b(?:3\s*[-–—]\s*5\s+business\s+days?|5\s*[-–—]\s*7\s+business\s+days?|7\s*[-–—]\s*10\s+business\s+days?|24\s*[-–—]\s*48\s+hours?|48\s+hours?|45\s+days?|80\s*\/\s*20|1,?000)\b/i.test(
+    match,
+  );
 
       if (standardPolicyReference) continue;
 
@@ -228,26 +258,24 @@ export class DraftValidator {
     }
 
     if (UNSUPPORTED_QUARTER_LINKAGE_PATTERN.test(draft)) {
-  issues.push(
-    'The draft makes an unsupported claim about the reporting quarter recorded in the system.',
-  );
-}
+      issues.push('The draft makes an unsupported claim about the reporting quarter recorded in the system.');
+    }
 
     const asksAboutThreshold =
       /\b(?:minimum payout threshold|payout threshold|minimum threshold|threshold)\b/i.test(ticketText);
+
+    const combinedSource = `${ticketText}\n${numericSourceText}`;
     const hasPendingAmount =
       /\b(?:pending|unpaid|not received|haven't received|have not received|awaiting payment)\b/i.test(
-        `${ticketText}\n${numericSourceText}`,
+        combinedSource,
       ) || /(?:royalty[_\s-]*pending|pending[_\s-]*(?:royalty|balance|amount)|pendingRoyaltyAmount)/i.test(numericSourceText);
+
     const hasPendingBalanceFact =
       /(?:royalty[_\s-]*pending|pending[_\s-]*(?:royalty|balance|amount)|pendingRoyaltyAmount)["']?\s*[:=]?\s*["']?(?:₹|INR\s*|Rs\.?\s*)?\d/i.test(numericSourceText) ||
       /\b(?:pending (?:royalty )?(?:balance|amount)|(?:royalty )?balance currently pending)\b[^.!?\n]{0,50}(?:₹|INR\s*|Rs\.?\s*)\d/i.test(numericSourceText);
-    const mentionsThreshold =
-      /\b(?:threshold|minimum payout|minimum payment)\b/i.test(draft);
 
-    // The evaluator expects a grounded threshold comparison whenever the
-    // current royalty record provides a pending balance, even if the author
-    // did not repeat the threshold question in the ticket text.
+    const mentionsThreshold = /\b(?:threshold|minimum payout|minimum payment)\b/i.test(draft);
+
     if (
       hasPendingBalanceFact &&
       (asksAboutThreshold || category.includes('royalty')) &&
@@ -266,62 +294,123 @@ export class DraftValidator {
   }
 
   private validateActions(
-    draft: string,
-    factsText: string,
-    ticketText: string,
-    category: string,
-    issues: string[],
-  ): void {
-    if (BANK_INFORMATION_REQUEST_PATTERN.test(draft)) {
-      issues.push('The draft requests sensitive banking information.');
-    }
-
-    if (DISTRIBUTION_ACTION_PATTERN.test(draft)) {
-      issues.push('The draft asks the author to perform an unsupported distribution-sync action.');
-    }
-
-    if (COMPLETED_ACTION_PATTERN.test(draft) && !supportsActionClaim(draft, factsText)) {
-      issues.push('The draft claims that an action has already occurred without supporting facts.');
-    }
-
-    if (IN_PROGRESS_ACTION_PATTERN.test(draft) && !supportsActionClaim(draft, factsText)) {
-      issues.push('The draft claims that an internal action is in progress without supporting facts.');
-    }
-
-    const hasApprovedFollowUp = APPROVED_FOLLOW_UP.test(draft);
-
-    if (UNSUPPORTED_FUTURE_ACTION.test(draft) && !hasApprovedFollowUp) {
-      issues.push('The draft promises an unsupported future action or update.');
-    }
-
-    if (FIRST_PERSON_PROMISE.test(draft)) {
-      issues.push('The draft contains a first-person promise or unsupported follow-up commitment.');
-    }
-
-    if (hasApprovedFollowUp && !isFollowUpAppropriate(category, ticketText)) {
-      issues.push('The 48-hour follow-up commitment is not supported for this ticket type.');
-    }
-
-    if (
-      HARD_ACTION.test(draft) &&
-      /\b(?:I|we|our team|the support team|the production team|the finance team)\b/i.test(draft) &&
-      !hasApprovedFollowUp &&
-      !supportsActionClaim(draft, factsText)
-    ) {
-      // A hedge does not make an unsupported commitment safe by itself. Only
-      // explicit authorized follow-up or facts about the action can support it.
-      if (!/\b(?:may|might|could|would|if needed|if appropriate|whether)\b/i.test(draft)) {
-        issues.push('The draft may promise an action that is not confirmed by the available facts.');
-      }
-    }
-
-    if (
-      /\b(?:we|our team|the support team)\b[^.!?\n]{0,100}\b(?:escalate|forward|investigate|review)\b/i.test(draft) &&
-      !supportsActionClaim(draft, factsText)
-    ) {
-      issues.push('The draft makes an unverified internal action claim.');
-    }
+  draft: string,
+  factsText: string,
+  ticketText: string,
+  category: string,
+  issues: string[],
+): void {
+  // Never request sensitive banking information.
+  if (BANK_INFORMATION_REQUEST_PATTERN.test(draft)) {
+    issues.push(
+      'The draft requests sensitive banking information.',
+    );
   }
+
+  // Publishing-specific workflow validation.
+  const isPublishingQuestion =
+    /\b(?:how\s+(?:do\s+i|can\s+i|to)\s+publish|publish(?:ing)?\s+(?:a|the|my|your)\s+book|publishing process|book publishing)\b/i.test(
+      ticketText,
+    );
+
+  const unsupportedPublishingWorkflow =
+    /\b(?:publish\s+(?:a|the|new)\s+book\s+(?:wizard|tab|section)|publish(?:ing)?\s+(?:tab|section|wizard)|set\s+pricing|pricing\s+setup|cover\s+files|supporting\s+(?:files|materials|documents)|file\s+formats?|upload\s+your\s+content|follow\s+the\s+prompts|(?:you|the system|the dashboard)\s+(?:will\s+)?be\s+prompted|the system will guide|the dashboard will guide|production team will review\s+(?:the\s+)?(?:files|materials|submission)|we(?:'ll|’ll| will)\s+(?:handle|manage|complete|take care of)\s+(?:the\s+)?(?:setup|upload|publishing process)|we(?:'ll|’ll| will)\s+guide you|guide you through\s+(?:the\s+)?(?:upload|setup|publishing|next steps)|direct you to\s+(?:the\s+)?(?:appropriate\s+)?(?:support\s+)?resources)\b/i;
+
+  const unsupportedEmailWorkflow =
+    /\b(?:email|emailing)\s+(?:us|bookleaf|our team|the team)\b.{0,100}\b(?:publish|publishing|start|begin|setup|details|process)\b|\b(?:start|begin)\b[^.!?\n]{0,60}\bpublishing process\b[^.!?\n]{0,40}\bby emailing\b/i;
+
+  if (
+    isPublishingQuestion &&
+    (
+      unsupportedPublishingWorkflow.test(draft) ||
+      unsupportedEmailWorkflow.test(draft)
+    )
+  ) {
+    issues.push(
+      'The draft invents an undocumented publishing workflow or an unsupported assistance commitment.',
+    );
+  }
+
+  // Do not tell authors to trigger an unsupported distribution re-sync.
+  if (DISTRIBUTION_ACTION_PATTERN.test(draft)) {
+    issues.push(
+      'The draft asks the author to perform an unsupported distribution-sync action.',
+    );
+  }
+
+  // Do not claim completed actions without supporting facts.
+  if (
+    COMPLETED_ACTION_PATTERN.test(draft) &&
+    !supportsActionClaim(draft, factsText)
+  ) {
+    issues.push(
+      'The draft claims that an action has already occurred without supporting facts.',
+    );
+  }
+
+  // Do not claim internal work is currently in progress without evidence.
+  if (
+    IN_PROGRESS_ACTION_PATTERN.test(draft) &&
+    !supportsActionClaim(draft, factsText)
+  ) {
+    issues.push(
+      'The draft claims that an internal action is in progress without supporting facts.',
+    );
+  }
+
+  const hasApprovedFollowUp = APPROVED_FOLLOW_UP.test(draft);
+
+  if (
+    UNSUPPORTED_FUTURE_ACTION.test(draft) &&
+    !hasApprovedFollowUp
+  ) {
+    issues.push(
+      'The draft promises an unsupported future action or update.',
+    );
+  }
+
+  if (FIRST_PERSON_PROMISE.test(draft)) {
+    issues.push(
+      'The draft contains a first-person promise or unsupported follow-up commitment.',
+    );
+  }
+
+  if (
+    hasApprovedFollowUp &&
+    !isFollowUpAppropriate(category, ticketText)
+  ) {
+    issues.push(
+      'The 48-hour follow-up commitment is not supported for this ticket type.',
+    );
+  }
+
+  if (
+    HARD_ACTION.test(draft) &&
+    /\b(?:I|we|our team|the support team|the production team|the finance team)\b/i.test(
+      draft,
+    ) &&
+    !hasApprovedFollowUp &&
+    !supportsActionClaim(draft, factsText) &&
+    !/\b(?:may|might|could|would|if needed|if appropriate|whether)\b/i.test(
+      draft,
+    )
+  ) {
+    issues.push(
+      'The draft may promise an action that is not confirmed by the available facts.',
+    );
+  }
+
+  if (
+    /\b(?:we|our team|the support team)\b[^.!?\n]{0,100}\b(?:escalate|forward|investigate|review)\b/i.test(
+      draft,
+    ) &&
+    !supportsActionClaim(draft, factsText)
+  ) {
+    issues.push(
+      'The draft makes an unverified internal action claim.',
+    );
+  }
+}
 
   private validateMissingInformationClaims(
     draft: string,
@@ -344,9 +433,10 @@ export class DraftValidator {
     }
 
     const bankStatus = getBankDetailsStatus(trustedContexts);
-    const bankClaimSentences = (draft.match(/[^.!?]+[.!?]?/g) ?? []).filter(
-      (sentence) => BANK_DETAILS_ASSERTION_PATTERN.test(sentence),
+    const bankClaimSentences = (draft.match(/[^.!?]+[.!?]?/g) ?? []).filter((sentence) =>
+      BANK_DETAILS_ASSERTION_PATTERN.test(sentence),
     );
+
     const hasUnsupportedBankAssertion = bankClaimSentences.some(
       (sentence) =>
         !BANK_DETAILS_CHECK_REQUEST_PATTERN.test(sentence) && bankStatus !== 'linked',
@@ -359,42 +449,82 @@ export class DraftValidator {
     }
   }
 
-  private validateTiming(draft: string, sourceText: string, issues: string[]): void {
-    if (VAGUE_TIMELINE_PATTERN.test(draft)) {
-      issues.push('The draft uses a vague timeline that may create an unsupported expectation.');
+  private validateTiming(
+  draft: string,
+  sourceText: string,
+  policyReferenceText: string,
+  issues: string[],
+): void {
+  if (VAGUE_TIMELINE_PATTERN.test(draft)) {
+    issues.push(
+      'The draft uses a vague timeline that may create an unsupported expectation.',
+    );
+  }
+
+  if (RESOLUTION_PROMISE_PATTERN.test(draft)) {
+    issues.push(
+      'The draft promises resolution within 48 hours without verified authorization.',
+    );
+  }
+
+  if (PAYMENT_DATE_PROMISE_PATTERN.test(draft)) {
+    issues.push(
+      'The draft promises a payment date without verified payment details.',
+    );
+  }
+
+  const sourceDateKeys = new Set(
+    extractConcreteDates(sourceText).map(dateKey),
+  );
+
+  const policyDateKeys = new Set(
+    extractConcreteDates(policyReferenceText).map(dateKey),
+  );
+
+  const sentences = draft.match(/[^.!?]+[.!?]?/g) ?? [];
+
+  for (const date of extractConcreteDates(draft)) {
+    const key = dateKey(date);
+
+    // Dates already present in the ticket or book context remain valid.
+    if (sourceDateKeys.has(key)) {
+      continue;
     }
 
-    if (RESOLUTION_PROMISE_PATTERN.test(draft)) {
-      issues.push('The draft promises resolution within 48 hours without verified authorization.');
-    }
-
-    if (PAYMENT_DATE_PROMISE_PATTERN.test(draft)) {
-      issues.push('The draft promises a payment date without verified payment details.');
-    }
-
-    const sourceDateKeys = new Set(extractConcreteDates(sourceText).map(dateKey));
-    for (const date of extractConcreteDates(draft)) {
-      if (!sourceDateKeys.has(dateKey(date))) {
-        issues.push(
-          `The draft contains a specific calendar date that is not supported by the ticket or book context: "${date}".`,
-        );
+    // Policy-reference dates are permitted only in an explicitly
+    // identified general-policy sentence.
+    const isAuthorizedPolicyDate = sentences.some((sentence) => {
+      if (!POLICY_REFERENCE_PREFIX.test(sentence)) {
+        return false;
       }
-    }
 
-    const sentences = draft.match(/[^.!?]+[.!?]?/g) ?? [];
-    for (const sentence of sentences) {
-      if (
-        DATE_OR_PERIOD_PATTERN.test(sentence) &&
-        !POLICY_REFERENCE_PREFIX.test(sentence) &&
-        !containsSourceTimeReference(sentence, sourceText)
-      ) {
-        issues.push(
-          'A specific payment-cycle reference must begin with "As a general policy reference," unless it is supplied in the ticket or book context.',
-        );
-        break;
-      }
+      return extractConcreteDates(sentence).some(
+        (sentenceDate) =>
+          dateKey(sentenceDate) === key && policyDateKeys.has(key),
+      );
+    });
+
+    if (!isAuthorizedPolicyDate) {
+      issues.push(
+        `The draft contains a specific calendar date that is not supported by the ticket or book context, or is not properly identified as a policy reference: "${date}".`,
+      );
     }
   }
+
+  for (const sentence of sentences) {
+    if (
+      DATE_OR_PERIOD_PATTERN.test(sentence) &&
+      !POLICY_REFERENCE_PREFIX.test(sentence) &&
+      !containsSourceTimeReference(sentence, sourceText)
+    ) {
+      issues.push(
+        'A specific payment-cycle reference must begin with "As a general policy reference," unless it is supplied in the ticket or book context.',
+      );
+
+      break;
+    }
+  }
+}
 }
 
 function normalizeWhitespace(value: string): string {
@@ -458,11 +588,13 @@ function supportsActionClaim(draft: string, factsText: string): boolean {
 function isFollowUpAppropriate(category: string, ticketText: string): boolean {
   const supportedCategory =
     category.includes('royalty') || category.includes('isbn') || category.includes('production');
+
   const supportedSignal =
     ROYALTY_DELAY_SIGNAL.test(ticketText) ||
     ROYALTY_LOW_AMOUNT_SIGNAL.test(ticketText) ||
     ISBN_ERROR_SIGNAL.test(ticketText) ||
     PRODUCTION_DELAY_SIGNAL.test(ticketText);
+
   return supportedCategory && supportedSignal;
 }
 
@@ -478,6 +610,7 @@ function extractConcreteDates(value: string): string[] {
   for (const pattern of patterns) {
     matches.push(...(value.match(pattern) ?? []));
   }
+
   return [...new Set(matches)];
 }
 
@@ -485,7 +618,9 @@ function dateKey(rawDate: string): string {
   const date = rawDate.trim().toLowerCase().replace(/,/g, '').replace(/\s+/g, ' ');
 
   const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(date);
-  if (iso) return makeIsoDate(Number(iso[1]), Number(iso[2]), Number(iso[3])) ?? `raw:${date}`;
+  if (iso) {
+    return makeIsoDate(Number(iso[1]), Number(iso[2]), Number(iso[3])) ?? `raw:${date}`;
+  }
 
   const dayMonthYear = /^(\d{1,2})\s+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{4})$/.exec(date);
   if (dayMonthYear) {
@@ -499,8 +634,7 @@ function dateKey(rawDate: string): string {
     return makeIsoDate(Number(monthDayYear[3]), month, Number(monthDayYear[2])) ?? `raw:${date}`;
   }
 
-  // Slash-formatted dates are retained in normalized raw form because their
-  // day/month ordering can be ambiguous across locales.
+  // Slash-formatted dates remain raw because the day/month order can vary.
   return `raw:${date.replace(/\b0+(\d)\b/g, '$1')}`;
 }
 
@@ -532,6 +666,7 @@ function makeIsoDate(year: number, month: number, day: number): string | null {
   ) {
     return null;
   }
+
   return `date:${date.toISOString().slice(0, 10)}`;
 }
 
@@ -540,7 +675,12 @@ function containsSourceTimeReference(sentence: string, sourceText: string): bool
   const sourceLower = sourceText.toLowerCase();
 
   const dateMatches = extractConcreteDates(sentence);
-  if (dateMatches.some((date) => extractConcreteDates(sourceLower).some((sourceDate) => dateKey(sourceDate) === dateKey(date)))) {
+  const sourceDates = extractConcreteDates(sourceLower);
+  if (
+    dateMatches.some((date) =>
+      sourceDates.some((sourceDate) => dateKey(sourceDate) === dateKey(date)),
+    )
+  ) {
     return true;
   }
 
@@ -548,19 +688,25 @@ function containsSourceTimeReference(sentence: string, sourceText: string): bool
   return periodMatches.some((period) => sourceLower.includes(period));
 }
 
-function flattenEntries(value: unknown, parentPath = ''): Array<{ key: string; path: string; value: unknown }> {
+function flattenEntries(
+  value: unknown,
+  parentPath = '',
+): Array<{ key: string; path: string; value: unknown }> {
   if (Array.isArray(value)) {
     return value.flatMap((item, index) => flattenEntries(item, `${parentPath}[${index}]`));
   }
+
   if (value === null || typeof value !== 'object') return [];
 
   const record = value as Record<string, unknown>;
   const result: Array<{ key: string; path: string; value: unknown }> = [];
+
   for (const [key, child] of Object.entries(record)) {
     const path = parentPath ? `${parentPath}.${key}` : key;
     result.push({ key, path, value: child });
     result.push(...flattenEntries(child, path));
   }
+
   return result;
 }
 
@@ -584,8 +730,7 @@ function getBankDetailsStatus(contexts: unknown[]): 'linked' | 'missing' | 'unkn
 
       const raw = entry.value;
       if (typeof raw === 'boolean') {
-        if (raw) statuses.add('linked');
-        else statuses.add('missing');
+        statuses.add(raw ? 'linked' : 'missing');
         continue;
       }
 
@@ -613,13 +758,21 @@ function hasVerifiedInformationCompleteness(contexts: unknown[]): boolean {
       const positiveCompletionFlag = /^(?:nofurtherinformationrequired|noadditionalinformationrequired|allrequiredinformationprovided|supportinformationcomplete|caseinformationcomplete|informationcomplete|requiredinformationcomplete)$/.test(key);
       const negativeNeedFlag = /^(?:additionalinformationrequired|furtherinformationrequired|missinginformation|requiredinformationmissing)$/.test(key);
 
-      if (positiveCompletionFlag && (value === true || (typeof value === 'string' && /^(?:true|yes|complete|completed|all provided|none required)$/i.test(value.trim())))) {
+      if (
+        positiveCompletionFlag &&
+        (value === true || (typeof value === 'string' && /^(?:true|yes|complete|completed|all provided|none required)$/i.test(value.trim())))
+      ) {
         return true;
       }
-      if (negativeNeedFlag && (value === false || (typeof value === 'string' && /^(?:false|no|none|not required)$/i.test(value.trim())))) {
+
+      if (
+        negativeNeedFlag &&
+        (value === false || (typeof value === 'string' && /^(?:false|no|none|not required)$/i.test(value.trim())))
+      ) {
         return true;
       }
     }
   }
+
   return false;
 }
