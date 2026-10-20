@@ -26,12 +26,13 @@ An AI-assisted support workspace for BookLeaf Publishing. Authors can access the
 
 | Component | URL |
 |-----------|-----|
+| Demo video (Loom) | https://www.loom.com/share/c91d9c20e82c4e20ac926579b44fb198 |
 | Frontend (Vercel) | https://frontend-amber-eta-zc5pkg9crv.vercel.app/ |
 | Backend API (Render) | https://bookleaf-support-portal-kexq.onrender.com/api |
 | Swagger UI | https://bookleaf-support-portal-kexq.onrender.com/docs |
 | Source code | https://github.com/ankittrip/bookleaf-support-portal |
 
-> **Note:** The backend runs on Render's free tier and spins down after inactivity. The first request after a idle period can take 50 seconds or more, so please allow the initial login or page load to complete.
+> **Note:** The backend runs on Render's free tier and spins down after inactivity. The first request after an idle period can take 50 seconds or more, so please allow the initial login or page load to complete.
 
 
 ## Demo Accounts
